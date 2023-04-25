@@ -63,7 +63,7 @@ class _ButtonMenu extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         ElevatedButton(
-          child: Text('search'),
+          child: Text('Search'),
           onPressed: () {
             context.read<MainProvider>().searchServer();
           },
@@ -81,7 +81,7 @@ class _ButtonMenu extends StatelessWidget {
           },
         ),
         ElevatedButton(
-          child: Text('close'),
+          child: Text('Close'),
           onPressed: () {
             context.read<MainProvider>().closeSocket();
           },
