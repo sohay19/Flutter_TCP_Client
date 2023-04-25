@@ -30,7 +30,10 @@ class _MaterialMainPageState extends State<MaterialMainPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _ButtonMenu(),
+            SizedBox(
+              height: 50,
+              child: _ButtonMenu(),
+            ),
             SizedBox(
               height: 20,
             ),
@@ -43,10 +46,20 @@ class _MaterialMainPageState extends State<MaterialMainPage> {
             Container(
               height: 50,
               child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    Colors.black,
+                  )
+                ),
                 onPressed: () {
                   context.read<MainProvider>().clearMessage();
                 },
-                child: Text('Clear'),
+                child: Text(
+                    'Clear',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ],
@@ -60,31 +73,94 @@ class _ButtonMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton(
-          child: Text('Search'),
-          onPressed: () {
-            context.read<MainProvider>().searchServer();
-          },
+        Expanded(
+            child: ElevatedButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    Colors.white60,
+                  )
+              ),
+              child: Text(
+                  'Search',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              onPressed: () {
+                context.read<MainProvider>().searchServer();
+              },
+            ),
         ),
-        ElevatedButton(
-          child: Text('Get Int'),
-          onPressed: () {
-            context.read<MainProvider>().sendServer(OperatorType.GETINT);
-          },
+        SizedBox(
+          width: 10,
         ),
-        ElevatedButton(
-          child: Text('Get String'),
-          onPressed: () {
-            context.read<MainProvider>().sendServer(OperatorType.GETSTRING);
-          },
+        Expanded(
+          child: ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.white60,
+                )
+            ),
+            child: Text(
+                'Get Int',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            onPressed: () {
+              context.read<MainProvider>().sendServer(OperatorType.GETINT);
+            },
+          ),
         ),
-        ElevatedButton(
-          child: Text('Close'),
-          onPressed: () {
-            context.read<MainProvider>().closeSocket();
-          },
+        SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.white60,
+                )
+            ),
+            child: Text(
+                'Get String',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            onPressed: () {
+              context.read<MainProvider>().sendServer(OperatorType.GETSTRING);
+            },
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.white60,
+                )
+            ),
+            child: Text(
+              'Close',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            onPressed: () {
+              context.read<MainProvider>().closeSocket();
+            },
+          ),
         ),
       ],
     );
