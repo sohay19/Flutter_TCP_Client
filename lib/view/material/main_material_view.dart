@@ -92,9 +92,13 @@ class _ButtonMenu extends StatelessWidget {
 }
 
 class _MessageView extends StatelessWidget {
+  ScrollController controller = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     final message = context.select<MainProvider, String>((provider) => provider.message);
+    _scrolling();
+
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -108,5 +112,15 @@ class _MessageView extends StatelessWidget {
         child: Text(message),
       ),
     );
+  }
+
+  _scrolling() {
+    if(controller.positions.isNotEmpty) {
+      controller.animateTo(
+        controller.position.maxScrollExtent,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 }
