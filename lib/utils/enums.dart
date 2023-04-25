@@ -2,6 +2,7 @@ enum ErrorType {
   NO_SUPPORT_PLATFORM,
   NO_NETWORK,
   BIND,
+  CONNECT,
   SEND,
 }
 

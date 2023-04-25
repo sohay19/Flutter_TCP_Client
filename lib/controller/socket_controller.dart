@@ -15,10 +15,12 @@ class SocketController {
 
   late Socket _socket;
   late AddressInfo _myInfo;
+  late AddressInfo _serverInfo;
 
 
   SocketController() {
     _myInfo = new AddressInfo();
+    _serverInfo = new AddressInfo();
   }
 
   setNetworkInfo() async {
@@ -81,13 +83,18 @@ class SocketController {
           print('========= Broadcast =========');
           String receiveData = String.fromCharCodes(datagram.data);
           print("${receiveData}");
+          //
+          final list = receiveData.split(' ');
+          _serverInfo.ip = list.first;
+          _serverInfo.port = int.parse(list.last);
         }
       });
       final String sendMsg = 'search ${_myInfo.ip} ${Static.MY_PORT}';
       final sendData = utf8.encode(sendMsg);
       socket.send(sendData, InternetAddress('255.255.255.255'), Static.UDP_PORT);
-      await Future.delayed(Duration(milliseconds: 1000));
+      await Future.delayed(Duration(milliseconds: Static.UDP_TIME_OUT));
       socket.close();
+      _connectServer();
     } catch (e) {
       throw ErrorType.BIND;
     }
@@ -95,10 +102,10 @@ class SocketController {
 
   _connectServer() async {
     try {
-      _socket = await Socket.connect('', Static.TCP_PORT);
+      _socket = await Socket.connect(InternetAddress(_serverInfo.ip), _serverInfo.port);
       _socket.listen(_listenProcess);
     } catch (e) {
-      throw ErrorType.BIND;
+      throw ErrorType.CONNECT;
     }
   }
 
