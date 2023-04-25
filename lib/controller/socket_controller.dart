@@ -53,6 +53,7 @@ class SocketController {
 
     _myInfo.ip = ip;
     _myInfo.port = Static.UDP_PORT;
+    _searchServer();
   }
 
   _getEthernetInfo() async {
@@ -67,17 +68,26 @@ class SocketController {
     }
     _myInfo.ip = ip;
     _myInfo.port = Static.UDP_PORT;
+    _searchServer();
   }
 
   _searchServer() async {
     try {
-      RawDatagramSocket socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, Static.UDP_PORT);
+      RawDatagramSocket socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, Static.MY_PORT);
       socket.broadcastEnabled = true;
-      final String sendMsg = 'search ${_myInfo.ip}';
+      socket.listen((event) {
+        Datagram? datagram = socket.receive();
+        if (datagram != null) {
+          print('========= Broadcast =========');
+          String receiveData = String.fromCharCodes(datagram.data);
+          print("${receiveData}");
+        }
+      });
+      final String sendMsg = 'search ${_myInfo.ip} ${Static.MY_PORT}';
       final sendData = utf8.encode(sendMsg);
-      _socket.add(sendData);
-      await Future.delayed(Duration(milliseconds: 500));
-      _socket.close();
+      socket.send(sendData, InternetAddress('255.255.255.255'), Static.UDP_PORT);
+      await Future.delayed(Duration(milliseconds: 1000));
+      socket.close();
     } catch (e) {
       throw ErrorType.BIND;
     }
@@ -94,7 +104,9 @@ class SocketController {
 
   _listenProcess(Uint8List data) {
     try {
-
+      final receiveMsg = String.fromCharCodes(data);
+      print('===== receiveData =====');
+      print(receiveMsg);
     } catch (e) {
       throw ErrorType.SEND;
     }

@@ -5,10 +5,14 @@ import '../view_model/main_view_model.dart';
 
 
 class MainProvider with ChangeNotifier {
-  late MainViewModel mainViewmodel;
+  late MainViewModel _mainViewmodel;
 
 
   MainProvider() {
-    mainViewmodel = new MainViewModel();
+    _mainViewmodel = new MainViewModel();
+  }
+
+  searchServer() {
+    _mainViewmodel.searchServer();
   }
 }

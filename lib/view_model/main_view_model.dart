@@ -3,11 +3,15 @@ import '../controller/socket_controller.dart';
 
 
 class MainViewModel {
-  late SocketController socketController;
+  late SocketController _socketController;
 
 
   MainViewModel() {
-    socketController = new SocketController();
-    socketController.setNetworkInfo();
+    _socketController = new SocketController();
+    _socketController.setNetworkInfo();
+  }
+
+  searchServer() {
+    _socketController.setNetworkInfo();
   }
 }
