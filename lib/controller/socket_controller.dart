@@ -12,15 +12,16 @@ import '../utils/statc_value.dart';
 
 class SocketController {
   final Connectivity _connectivify = Connectivity();
-
-  late Socket _socket;
   late AddressInfo _myInfo;
-  late AddressInfo _serverInfo;
+
+  Socket? _socket;
+  AddressInfo? _serverInfo;
+  String showMsg = '';
+  Function? sendShowMessage;
 
 
   SocketController() {
     _myInfo = new AddressInfo();
-    _serverInfo = new AddressInfo();
   }
 
   setNetworkInfo() async {
@@ -80,21 +81,28 @@ class SocketController {
       socket.listen((event) {
         Datagram? datagram = socket.receive();
         if (datagram != null) {
-          print('========= Broadcast =========');
-          String receiveData = String.fromCharCodes(datagram.data);
-          print("${receiveData}");
-          //
-          final list = receiveData.split(' ');
-          _serverInfo.ip = list.first;
-          _serverInfo.port = int.parse(list.last);
+          String receiveMsg = String.fromCharCodes(datagram.data);
+          showMsg += '>> Receive\n';
+          showMsg += '${receiveMsg}\n';
+          final list = receiveMsg.split(' ');
+          _serverInfo = new AddressInfo();
+          _serverInfo?.ip = list.first;
+          _serverInfo?.port = int.parse(list.last);
+          _endProcess();
         }
       });
       final String sendMsg = 'search ${_myInfo.ip} ${Static.MY_PORT}';
+      showMsg += 'Search Server\n\n';
+      showMsg += '>> Send\n';
+      showMsg += '${sendMsg}\n';
+      _endProcess();
       final sendData = utf8.encode(sendMsg);
       socket.send(sendData, InternetAddress('255.255.255.255'), Static.UDP_PORT);
       await Future.delayed(Duration(milliseconds: Static.UDP_TIME_OUT));
       socket.close();
-      _connectServer();
+      if (_serverInfo != null) {
+        _connectServer();
+      }
     } catch (e) {
       throw ErrorType.BIND;
     }
@@ -102,8 +110,15 @@ class SocketController {
 
   _connectServer() async {
     try {
-      _socket = await Socket.connect(InternetAddress(_serverInfo.ip), _serverInfo.port);
-      _socket.listen(_listenProcess);
+      if (_serverInfo != null) {
+        final AddressInfo server = _serverInfo!;
+        showMsg += '>> Connect\n';
+        showMsg += 'Connecting...\n';
+        _endProcess();
+
+        _socket = await Socket.connect(InternetAddress(server.ip), server.port);
+        _socket?.listen(_listenProcess);
+      }
     } catch (e) {
       throw ErrorType.CONNECT;
     }
@@ -111,11 +126,52 @@ class SocketController {
 
   _listenProcess(Uint8List data) {
     try {
+      String result = '';
       final receiveMsg = String.fromCharCodes(data);
-      print('===== receiveData =====');
-      print(receiveMsg);
+      final list = receiveMsg.split(' ');
+      if (list.length > 1) {
+        final type = OperatorType.values.firstWhere((element) => element.msg == list.first);
+        switch (type) {
+          case OperatorType.GETINT:
+            result = 'INT = ' + list.last;
+            break;
+          case OperatorType.GETSTRING:
+            result = 'STRING = ' + list.last;
+            break;
+          default:
+            break;
+        }
+      } else {
+        result = receiveMsg;
+      }
+      showMsg += '>> Receive\n';
+      showMsg += '${result}\n';
+      _endProcess();
+    } catch (e) {
+      throw ErrorType.RECEIVE;
+    }
+  }
+
+  sendMessage(OperatorType type) {
+    try {
+      final sendMsg = type.msg;
+      showMsg += '>> Send\n';
+      showMsg += '${sendMsg}\n\n';
+      _socket?.add(utf8.encode(sendMsg));
     } catch (e) {
       throw ErrorType.SEND;
     }
+  }
+
+  _endProcess() {
+    sendShowMessage?.call(showMsg);
+    showMsg = '';
+  }
+
+  closeSocket() {
+    _socket?.close();
+    _serverInfo = null;
+    showMsg += 'Close\n';
+    _endProcess();
   }
 }

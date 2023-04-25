@@ -4,11 +4,13 @@ enum ErrorType {
   BIND,
   CONNECT,
   SEND,
+  RECEIVE,
 }
 
 enum OperatorType {
   SEARCH('search'),
-  CONNECT('connet');
+  GETINT('getint'),
+  GETSTRING('getstring');
 
   final String msg;
   const OperatorType(this.msg);
